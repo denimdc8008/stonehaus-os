@@ -1,133 +1,205 @@
-# Next.js Admin Template with TypeScript & Shadcn UI
+# Stonehaus OS
 
-**Studio Admin** - Includes multiple dashboards, authentication layouts, customizable theme presets, and more.
+> **Internal CRM & Operations Platform for institutional land and powered-site development.**
 
-<img src="https://github.com/arhamkhnz/next-shadcn-admin-dashboard/blob/main/media/dashboard.png?version=5" alt="Dashboard Screenshot">
+---
 
-Most admin templates I found, free or paid, felt cluttered, outdated, or too rigid. I built this as a cleaner alternative with features often missing in others, such as theme toggling and layout controls, while keeping the design modern, minimal, and flexible.
+## Overview
 
-I’ve taken design inspiration from various sources. If you’d like credit for something specific, feel free to open an issue or reach out.
+Stonehaus OS is the internal operating system for Stonehaus Holdings. It centralizes every stage of the land development lifecycle — from origination through exit — into one secure, auditable, role-based platform.
 
-> **View demo:** [studio admin](https://next-shadcn-admin-dashboard.vercel.app)
+Built on [`next-shadcn-admin-dashboard`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard) with the Stonehaus brand system applied on top.
 
-> [!TIP]
-> I’m also working on Nuxt.js, Svelte, and React (Vite + TanStack Router) versions of this dashboard. They’ll be live soon.
-
-## Features
-
-- Built with Next.js 16, TypeScript, Tailwind CSS v4, and Shadcn UI  
-- Responsive and mobile-friendly  
-- Customizable theme presets (light/dark modes with color schemes like Tangerine, Brutalist, and more)  
-- Flexible layouts (collapsible sidebar, variable content widths)  
-- Authentication flows and screens  
-- Prebuilt dashboards (Default, CRM, Finance) with more coming soon  
-- Role-Based Access Control (RBAC) with config-driven UI and multi-tenant support *(planned)*  
-
-> [!NOTE]
-> The default dashboard uses the **shadcn neutral** theme.  
-> It also includes additional color presets inspired by [Tweakcn](https://tweakcn.com):  
->
-> - Tangerine  
-> - Neo Brutalism  
-> - Soft Pop  
->
-> You can create more presets by following the same structure as the existing ones.
-
-> Looking for the **Next.js 15** version?  
-> Check out the [`archive/next15`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard/tree/archive/next15) branch.  
-> This branch contains the setup prior to upgrading to Next 16 and the React Compiler.
-
-> Looking for the **Next.js 14 + Tailwind CSS v3** version?  
-> Check out the [`archive/next14-tailwindv3`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard/tree/archive/next14-tailwindv3) branch.  
-> It has a different color theme and is not actively maintained, but I try to keep it updated with major changes.  
+---
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4  
-- **UI Components**: Shadcn UI  
-- **Validation**: Zod  
-- **Forms & State Management**: React Hook Form, Zustand  
-- **Tables & Data Handling**: TanStack Table  
-- **Tooling & DX**: Biome, Husky  
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, TypeScript, Tailwind v4, shadcn/ui |
+| Backend | Next.js App Router, Server Actions, API Routes |
+| Database | PostgreSQL |
+| Auth | SSO + MFA (RBAC enforced server-side) |
+| Storage | Cloud object storage (signed URLs) |
+| Security | OWASP ASVS Level 2, NIST SSDF practices |
+| Deployment | AWS (primary) / Vercel (staging) |
 
-## Screens
+---
 
-### Available
-- Default Dashboard  
-- CRM Dashboard  
-- Finance Dashboard  
-- Authentication (4 screens)
+## Modules (v1)
 
-### Coming Soon
-- Analytics Dashboard  
-- eCommerce Dashboard  
-- Academy Dashboard  
-- Logistics Dashboard  
-- Email Page  
-- Chat Page  
-- Calendar Page  
-- Kanban Board  
-- Invoice Page  
-- Users Management  
-- Roles Management  
+| Module | Description |
+|---|---|
+| Portfolio | All projects/SPVs with stage, MW, acres, capital, health status |
+| Critical Dates | Contract, diligence, permitting, and financing deadlines with alerts |
+| Tasks & Approvals | Assignments, approval queues, automated task generation |
+| Contracts | LOIs, PSAs, easements, consultant and utility agreements |
+| Finance | Budget, committed, invoiced, paid, variance, CSV import/export |
+| Risks & Issues | Risk register with severity, mitigation, and closure workflows |
 
-## Colocation File System Architecture
+---
 
-This project follows a **colocation-based architecture** each feature keeps its own pages, components, and logic inside its route folder.  
-Shared UI, hooks, and configuration live at the top level, making the codebase modular, scalable, and easier to maintain as the app grows.
+## Branch Strategy
 
-For a full breakdown of the structure with examples, see the [Next Colocation Template](https://github.com/arhamkhnz/next-colocation-template).
-
-## Getting Started
-
-You can run this project locally, or deploy it instantly with Vercel.
-
-### Deploy with Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Farhamkhnz%2Fnext-shadcn-admin-dashboard)
-
-_Deploy your own copy with one click._
-
-### Run locally
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/arhamkhnz/next-shadcn-admin-dashboard.git
-   ```
-   
-2. **Navigate into the project**
-   ```bash
-    cd next-shadcn-admin-dashboard
-   ```
-   
-3. **Install dependencies**
-   ```bash
-    npm install
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-Your app will be running at [http://localhost:3000](http://localhost:3000)
-
-### Formatting and Linting
-
-Format, lint, and organize imports
-```bash
-npx @biomejs/biome check --write
 ```
-> For more information on available rules, fixes, and CLI options, refer to the [Biome documentation](https://biomejs.dev/).
+main                          # production-ready, protected
+develop                       # integration branch, PRs merge here first
+feature/stonehaus-theme       # brand tokens, logo, Uiverse components
+feature/portfolio-module      # portfolio dashboard and project detail
+feature/critical-dates-module # critical dates table, alerts, status logic
+feature/contracts-module      # contract registry and renewal alerts
+feature/finance-module        # budget, invoices, CSV import/export
+feature/risks-module          # risk register and workflows
+feature/tasks-approvals-module # tasks board and approval queue
+feature/auth-rbac             # SSO, MFA, role-based access control
+```
+
+**Flow:** `feature/*` → `develop` (PR + review) → `main` (PR + approval)
 
 ---
 
-> [!IMPORTANT]  
-> This project is updated frequently. If you’re working from a fork or an older clone, pull the latest changes before syncing. Some updates may include breaking changes.
+## Stage-Gate Model
+
+1. Origination
+2. Screening
+3. LOI / Term Sheet
+4. Site Control / PSA
+5. Diligence
+6. Entitlements
+7. Power / Utility / Interconnection
+8. Preconstruction
+9. Capital Formation
+10. Exit / NTP-Ready / Hold
 
 ---
 
-Contributions are welcome. Feel free to open issues, feature requests, or start a discussion.
+## Brand System
 
+| Token | Hex | Usage |
+|---|---|---|
+| `stone.primary` | `#0d2840` | Navy — primary actions, sidebar |
+| `stone.accent` | `#c9a668` | Gold — highlights, focus rings |
+| `stone.support.bluegray` | `#4a5f6d` | Secondary elements |
+| `stone.support.sage` | `#889887` | Tertiary / chart series |
+| `stone.neutral.900` | `#1c1c1c` | Near-black text |
+| `stone.surface` | `#f8f6f1` | Off-white backgrounds |
 
-**Happy Vibe Coding!**
+**Uiverse components** (`src/components/stonehaus/`):
+- `StonehausPrimaryButton`
+- `StonehausSecondaryButton`
+- `StonehausPill` (status chips)
+- `StonehausToggle`
+- `StonehausMetricCard`
+- `StonehausLoader`
+- `StonehausStageProgress`
+
+---
+
+## Security
+
+- OWASP ASVS Level 2 target
+- SSO + MFA for all users
+- Backend-enforced RBAC on all reads/writes/exports
+- Immutable audit logs: login, data changes, exports, approvals
+- Encryption at rest and in transit
+- CI/CD: dependency scanning, SAST, code review gates
+- NIST SSDF: threat modeling, secure build, vulnerability response
+
+---
+
+## Roles
+
+| Role | Access |
+|---|---|
+| Super Admin | Full admin, user provisioning, audit logs |
+| Executive | Read-all, approve stage changes and major decisions |
+| Acquisitions | Pipeline, deal data, contacts, LOIs |
+| Development | Milestones, entitlements, utilities, risks |
+| Legal | Contracts, obligations, legal risks |
+| Finance | Budgets, invoices, exports |
+| Analyst | Contribute under supervision |
+| Read-only | Dashboards and reports only |
+
+---
+
+## Deployment
+
+### AWS (Production)
+- App: AWS App Runner or ECS Fargate
+- DB: Amazon RDS (PostgreSQL)
+- Storage: S3 with signed URLs
+- Auth: AWS Cognito or third-party SSO provider
+- CDN: CloudFront
+- Secrets: AWS Secrets Manager
+- Logs: CloudWatch
+
+### Vercel (Staging)
+- Next.js deployment via Vercel
+- Preview deployments per PR on `develop`
+- Environment variables via Vercel dashboard
+
+---
+
+## Getting Started (Local)
+
+```bash
+git clone https://github.com/denimdc8008/stonehaus-os.git
+cd stonehaus-os
+npm install
+cp .env.example .env.local
+# Fill in .env.local with DB, auth, and storage credentials
+npm run dev
+```
+
+---
+
+## Project Structure
+
+```
+src/
+  app/
+    (auth)/           # Login, MFA screens
+    (dashboard)/
+      portfolio/      # Portfolio dashboard
+      projects/       # Project detail pages
+      critical-dates/ # Critical dates module
+      tasks/          # Tasks & approvals
+      contracts/      # Contract registry
+      finance/        # Financial controls
+      risks/          # Risk register
+      documents/      # Document center
+      admin/          # Admin panel
+  components/
+    stonehaus/        # Stonehaus-branded Uiverse components
+    ui/               # shadcn/ui base components
+    layout/           # Sidebar, header, AppLogo
+  lib/
+    db/               # Database client and queries
+    auth/             # Auth helpers and RBAC
+    services/         # Business logic layer
+  types/              # Shared TypeScript types
+public/
+  stonehaus-logo.svg  # Primary logo asset
+```
+
+---
+
+## Delivery Phases
+
+| Phase | Focus | Status |
+|---|---|---|
+| 1 | Requirements, stage criteria, field definitions | Planning |
+| 2 | Theme tokens, logo, Uiverse components, wireframes | In Progress |
+| 3 | MVP modules + auth/RBAC/audit | Pending |
+| 4 | Pilot on 2-4 live projects | Pending |
+| 5 | Security hardening, pen test, production rollout | Pending |
+
+---
+
+## Spec Document
+
+Full product, design, and security spec is maintained in the team Notion/drive or can be found in `docs/stonehaus-os-spec.md`.
+
+---
+
+*Internal use only. All data is confidential and subject to Stonehaus Holdings information security policies.*
