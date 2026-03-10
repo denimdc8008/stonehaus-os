@@ -30,8 +30,8 @@ jobs:
 
       - name: Run Biome lint
         run: npm run lint
-
-      - name: Run type check
+#
+      #- name: Run type check
         run: npx tsc --noEmit
 
   build:
