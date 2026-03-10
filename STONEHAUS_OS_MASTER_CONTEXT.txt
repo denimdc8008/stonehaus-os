@@ -1,0 +1,270 @@
+================================================================================
+STONEHAUS OS — MASTER CONTEXT DOCUMENT FOR ANTIGRAVITY
+================================================================================
+Date: March 10, 2026
+Repository: https://github.com/denimdc8008/stonehaus-os
+Branch: feat/stonehaus-scaffold (15 commits ahead of main)
+Purpose: Complete context file for uploading to Antigravity machine
+
+================================================================================
+§ 1. EXECUTIVE SUMMARY
+================================================================================
+
+WHAT WAS BUILT:
+A complete Next.js 14 + TypeScript + Prisma scaffold for Stonehaus OS — an
+internal CRM and operations platform for institutional land development.
+
+The scaffold includes:
+- Full 14-model Prisma database schema (User, Property, Deal, Contact, Task,
+  Contract, Document, Activity, Budget, Risk, etc.)
+- NextAuth v5 authentication with credentials provider + RBAC
+- Login page (src/app/(auth)/login/page.tsx)
+- Dashboard layout with auth guard (src/app/(dashboard)/layout.tsx)
+- 4 core module pages: Dashboard home, Deals, Properties, Contacts, Tasks
+- Collapsible navigation sidebar with user menu
+- CI/CD pipeline (GitHub Actions: lint + typecheck + build)
+- Environment variables template (.env.example)
+- Complete BOOTSTRAP.md guide for local setup
+
+STATUS:
+✅ All files committed to feat/stonehaus-scaffold branch
+✅ 15 commits pushed to GitHub
+✅ Ready to clone and run on Antigravity
+
+================================================================================
+§ 2. WORK COMPLETED (COMMIT LOG)
+================================================================================
+
+1. feat(db): add full Stonehaus OS Prisma schema
+2. feat(auth): add NextAuth v5 config with RBAC
+3. feat(db): add Prisma client singleton
+4. feat(config): add .env.example with all required env vars
+5. ci: add GitHub Actions workflow (lint + typecheck + build)
+6. feat: add login page
+7. feat: add dashboard layout with auth guard
+8. feat: add dashboard home page with KPI stats
+9. feat: add deals pipeline page
+10. feat: add properties page
+11. feat: add contacts CRM page
+12. feat: add tasks page
+13. feat: add AppSidebar with nav groups and user menu
+14. docs: add BOOTSTRAP.md for local dev and Antigravity setup
+15. docs: add STONEHAUS_OS_MASTER_CONTEXT.txt (this file)
+
+================================================================================
+§ 3. QUICKSTART — GET RUNNING ON ANTIGRAVITY
+================================================================================
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/denimdc8008/stonehaus-os.git
+   cd stonehaus-os
+   git checkout feat/stonehaus-scaffold
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Edit .env.local:
+   - DATABASE_URL: PostgreSQL connection string
+   - NEXTAUTH_SECRET: Generate with `openssl rand -base64 32`
+   - NEXTAUTH_URL: http://localhost:3000
+
+4. Start PostgreSQL (if using Docker):
+   ```bash
+   docker run --name stonehaus-pg -e POSTGRES_PASSWORD=postgres \
+     -p 5432:5432 -d postgres:15
+   ```
+
+5. Initialize database:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
+
+6. Run development server:
+   ```bash
+   npm run dev
+   ```
+
+7. Open http://localhost:3000
+
+================================================================================
+§ 4. FILE TREE
+================================================================================
+
+stonehaus-os/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── prisma/
+│   └── schema.prisma
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   └── login/
+│   │   │       └── page.tsx
+│   │   └── (dashboard)/
+│   │       ├── layout.tsx
+│   │       ├── page.tsx
+│   │       ├── deals/
+│   │       │   └── page.tsx
+│   │       ├── properties/
+│   │       │   └── page.tsx
+│   │       ├── contacts/
+│   │       │   └── page.tsx
+│   │       └── tasks/
+│   │           └── page.tsx
+│   ├── components/
+│   │   └── layout/
+│   │       └── app-sidebar.tsx
+│   └── lib/
+│       ├── auth.ts
+│       └── db.ts
+├── .env.example
+├── BOOTSTRAP.md
+├── STONEHAUS_OS_MASTER_CONTEXT.txt (this file)
+└── [base next-shadcn-admin files...]
+
+
+================================================================================
+§ 5. KEY SOURCE FILES
+================================================================================
+
+All source code is committed to the feat/stonehaus-scaffold branch.
+View files at:
+
+https://github.com/denimdc8008/stonehaus-os/tree/feat/stonehaus-scaffold
+
+KEY FILES TO REVIEW:
+
+1. prisma/schema.prisma
+   14-model database schema covering all CRM entities
+   
+2. src/lib/auth.ts
+   NextAuth v5 configuration with credentials + RBAC
+   
+3. src/lib/db.ts
+   Prisma client singleton pattern
+   
+4. .env.example
+   Complete environment variable reference
+   
+5. src/app/(dashboard)/layout.tsx
+   Auth-guarded dashboard shell
+   
+6. src/components/layout/app-sidebar.tsx
+   Navigation sidebar with grouped menu items
+   
+7. src/app/(dashboard)/*/page.tsx
+   Module pages: deals, properties, contacts, tasks
+
+8. .github/workflows/ci.yml
+   CI/CD pipeline configuration
+
+9. BOOTSTRAP.md
+   Complete setup guide (in repo root)
+
+TO VIEW ANY FILE:
+Navigate to the GitHub URL above or pull the branch locally.
+
+================================================================================
+§ 6. NEXT STEPS (IMMEDIATE PRIORITIES)
+================================================================================
+
+1. ✅ COMPLETED: Scaffold foundation
+2. ✅ COMPLETED: Core module pages
+3. ✅ COMPLETED: Auth system
+4. ✅ COMPLETED: Database schema
+
+NEXT TO BUILD:
+
+5. [ ] Create Pull Request feat/stonehaus-scaffold → main
+6. [ ] Add CRUD forms for each module
+7. [ ] Build detail pages (/deals/[id], /properties/[id], etc.)
+8. [ ] Add server actions (src/app/(dashboard)/*/actions.ts)
+9. [ ] Create database seed script
+10. [ ] Add GIS/map integration for property views
+11. [ ] Wire up financial tracking with budget line items
+12. [ ] Set up production deployment (Vercel/Railway)
+13. [ ] Implement document upload (S3 integration)
+14. [ ] Add critical date reminder system
+15. [ ] Build risk matrix dashboard
+
+================================================================================
+§ 7. TECH STACK REFERENCE
+================================================================================
+
+| Component | Technology |
+|-----------|------------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS + shadcn/ui |
+| Database ORM | Prisma |
+| Database | PostgreSQL 15+ |
+| Auth | NextAuth v5 (Auth.js) |
+| Password Hash | bcryptjs |
+| Validation | Zod |
+| Linting | Biome |
+| CI/CD | GitHub Actions |
+| Icons | Lucide React |
+| Base Template | next-shadcn-admin (arhamkhnz) |
+
+================================================================================
+§ 8. GITHUB REPOSITORY STRUCTURE
+================================================================================
+
+REPOSITORY: https://github.com/denimdc8008/stonehaus-os
+
+BRANCHES:
+- main: Base fork from next-shadcn-admin
+- feat/stonehaus-scaffold: Active development (15 commits ahead)
+
+GITHUB ISSUES: 19 open
+PROJECT BOARD: "Stonehaus OS — Development Board"
+LABELS: 26 total (module: *, priority: *, type: *)
+
+BRANCH PROTECTION:
+- main requires PR + review + CI pass
+- All feature work in feat/* branches
+
+================================================================================
+§ 9. DATABASE MODELS (SUMMARY)
+================================================================================
+
+1. User — Team members with roles (ADMIN, EXECUTIVE, MANAGER, VIEWER)
+2. Contact — External relationships (brokers, owners, investors, attorneys)
+3. Company — Corporate entities for deals/properties
+4. Property — Land parcels with GIS, zoning, power capacity
+5. Deal — Acquisition pipeline (7 stages: PROSPECTING → CLOSED_WON)
+6. DealContact — Many-to-many relationship
+7. PropertyContact — Many-to-many relationship
+8. Contract — Legal agreements (PSA, LOI, leases, etc.)
+9. CriticalDate — Deadline tracking with reminders
+10. Task — Action items with priority levels
+11. FinancialRecord — Budget tracking and actual costs
+12. Risk — Risk register with likelihood × impact scoring
+13. AuditLog — Full activity tracking
+14. Setting — System configuration key/value store
+
+================================================================================
+§ 10. CONTACT & SUPPORT
+================================================================================
+
+REPOSITORY OWNER: denimdc8008
+REPO URL: https://github.com/denimdc8008/stonehaus-os
+ACTIVE BRANCH: feat/stonehaus-scaffold
+
+For questions or issues, create a GitHub Issue in the repository.
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+
