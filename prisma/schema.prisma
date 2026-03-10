@@ -1,0 +1,416 @@
+// Stonehaus OS — Prisma Schema
+// PostgreSQL + Prisma ORM
+// Full institutional land development CRM/OS data model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  EXECUTIVE
+  MANAGER
+  VIEWER
+}
+
+enum DealStage {
+  PROSPECTING
+  LETTER_OF_INTENT
+  UNDER_CONTRACT
+  DUE_DILIGENCE
+  CLOSING
+  CLOSED_WON
+  CLOSED_LOST
+  ON_HOLD
+}
+
+enum PropertyStatus {
+  PROSPECTING
+  UNDER_LETTER_OF_INTENT
+  UNDER_CONTRACT
+  OWNED
+  SOLD
+  PASS
+}
+
+enum ContractStatus {
+  DRAFT
+  UNDER_REVIEW
+  EXECUTED
+  EXPIRED
+  TERMINATED
+}
+
+enum ContractType {
+  PSA
+  LOI
+  OPTION_AGREEMENT
+  GROUND_LEASE
+  TITLE_COMMITMENT
+  PHASE_I_ESA
+  SURVEY
+  ZONING_LETTER
+  ENTITLEMENT_APPROVAL
+  JV_AGREEMENT
+  NDA
+  OTHER
+}
+
+enum TaskStatus {
+  BACKLOG
+  IN_PROGRESS
+  BLOCKED
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum RiskLikelihood {
+  VERY_LIKELY
+  LIKELY
+  POSSIBLE
+  UNLIKELY
+  RARE
+}
+
+enum RiskImpact {
+  CATASTROPHIC
+  MAJOR
+  MODERATE
+  MINOR
+  NEGLIGIBLE
+}
+
+enum RiskStatus {
+  OPEN
+  MITIGATED
+  ACCEPTED
+  CLOSED
+}
+
+enum ContactType {
+  BROKER
+  LANDOWNER
+  ATTORNEY
+  ENGINEER
+  TITLE_COMPANY
+  UTILITY
+  INVESTOR
+  JV_PARTNER
+  CONSULTANT
+  GOVERNMENT
+  OTHER
+}
+
+enum PowerCapacityUnit {
+  MW
+  GW
+  KW
+}
+
+// ─── MODELS ──────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String?
+  role          UserRole  @default(VIEWER)
+  avatarUrl     String?
+  mfaEnabled    Boolean   @default(false)
+  mfaSecret     String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  tasks         Task[]    @relation("AssignedTasks")
+  createdTasks  Task[]    @relation("CreatedTasks")
+  auditLogs     AuditLog[]
+  contacts      Contact[] @relation("ContactOwner")
+  deals         Deal[]    @relation("DealOwner")
+
+  @@map("users")
+}
+
+model Contact {
+  id          String      @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  company     String?
+  title       String?
+  type        ContactType
+  notes       String?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  ownerId     String?
+  owner       User?       @relation("ContactOwner", fields: [ownerId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  deals       DealContact[]
+  properties  PropertyContact[]
+  tasks       Task[]
+  contracts   Contract[]
+
+  @@map("contacts")
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  website     String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deals       Deal[]
+  properties  Property[]
+
+  @@map("companies")
+}
+
+model Property {
+  id                    String          @id @default(cuid())
+  name                  String
+  address               String?
+  city                  String
+  state                 String
+  county                String?
+  zip                   String?
+  lat                   Float?
+  lng                   Float?
+  acreage               Float?
+  status                PropertyStatus  @default(PROSPECTING)
+  zoning                String?
+  entitlementStatus     String?
+  powerCapacity         Float?
+  powerCapacityUnit     PowerCapacityUnit @default(MW)
+  substationProximity   Float?          // miles
+  transmissionVoltage   String?
+  utilityProvider       String?
+  askingPrice           Float?
+  contractPrice         Float?
+  currentValue          Float?
+  projectedExitValue    Float?
+  acquisitionCost       Float?
+  notes                 String?
+  companyId             String?
+  company               Company?        @relation(fields: [companyId], references: [id])
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  // Relations
+  deals         Deal[]
+  contracts     Contract[]
+  tasks         Task[]
+  contacts      PropertyContact[]
+  risks         Risk[]
+  criticalDates CriticalDate[]
+  financials    FinancialRecord[]
+
+  @@map("properties")
+}
+
+model Deal {
+  id              String      @id @default(cuid())
+  title           String
+  stage           DealStage   @default(PROSPECTING)
+  value           Float?
+  probability     Int?        // 0-100
+  expectedClose   DateTime?
+  actualClose     DateTime?
+  notes           String?
+  ownerId         String?
+  owner           User?       @relation("DealOwner", fields: [ownerId], references: [id])
+  companyId       String?
+  company         Company?    @relation(fields: [companyId], references: [id])
+  propertyId      String?
+  property        Property?   @relation(fields: [propertyId], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  contacts    DealContact[]
+  tasks       Task[]
+  contracts   Contract[]
+  risks       Risk[]
+  criticalDates CriticalDate[]
+  financials  FinancialRecord[]
+
+  @@map("deals")
+}
+
+model DealContact {
+  dealId      String
+  contactId   String
+  role        String?
+  deal        Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contact     Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([dealId, contactId])
+  @@map("deal_contacts")
+}
+
+model PropertyContact {
+  propertyId  String
+  contactId   String
+  role        String?
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, contactId])
+  @@map("property_contacts")
+}
+
+model Contract {
+  id              String          @id @default(cuid())
+  title           String
+  type            ContractType
+  status          ContractStatus  @default(DRAFT)
+  effectiveDate   DateTime?
+  expirationDate  DateTime?
+  executedDate    DateTime?
+  fileUrl         String?
+  notes           String?
+  propertyId      String?
+  property        Property?       @relation(fields: [propertyId], references: [id])
+  dealId          String?
+  deal            Deal?           @relation(fields: [dealId], references: [id])
+  contactId       String?
+  contact         Contact?        @relation(fields: [contactId], references: [id])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  criticalDates   CriticalDate[]
+
+  @@map("contracts")
+}
+
+model CriticalDate {
+  id          String    @id @default(cuid())
+  title       String
+  date        DateTime
+  notes       String?
+  reminder    Boolean   @default(true)
+  completed   Boolean   @default(false)
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  dealId      String?
+  deal        Deal?     @relation(fields: [dealId], references: [id])
+  contractId  String?
+  contract    Contract? @relation(fields: [contractId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("critical_dates")
+}
+
+model Task {
+  id            String       @id @default(cuid())
+  title         String
+  description   String?
+  status        TaskStatus   @default(BACKLOG)
+  priority      TaskPriority @default(MEDIUM)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  assigneeId    String?
+  assignee      User?        @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  createdById   String?
+  createdBy     User?        @relation("CreatedTasks", fields: [createdById], references: [id])
+  propertyId    String?
+  property      Property?    @relation(fields: [propertyId], references: [id])
+  dealId        String?
+  deal          Deal?        @relation(fields: [dealId], references: [id])
+  contactId     String?
+  contact       Contact?     @relation(fields: [contactId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("tasks")
+}
+
+model FinancialRecord {
+  id          String    @id @default(cuid())
+  category    String    // Due Diligence, Legal, Survey, Entitlement, etc.
+  description String
+  amount      Float
+  date        DateTime
+  budgeted    Float?
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  dealId      String?
+  deal        Deal?     @relation(fields: [dealId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("financial_records")
+}
+
+model Risk {
+  id              String          @id @default(cuid())
+  title           String
+  description     String?
+  category        String          // Regulatory, Environmental, Market, Legal, Financial, Operational
+  likelihood      RiskLikelihood
+  impact          RiskImpact
+  riskScore       Int             // likelihood * impact (1-25)
+  mitigationPlan  String?
+  status          RiskStatus      @default(OPEN)
+  ownerId         String?
+  propertyId      String?
+  property        Property?       @relation(fields: [propertyId], references: [id])
+  dealId          String?
+  deal            Deal?           @relation(fields: [dealId], references: [id])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("risks")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String
+  entity      String
+  entityId    String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
